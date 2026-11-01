@@ -4,7 +4,12 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 7.0"
+      version = "~> 8.9"
     }
   }
+  backend "gcs" {
+    bucket = "gcp-platform-lab-2026-terraform-state"
+    prefix = "bootstrap"
+  }
+
 }
