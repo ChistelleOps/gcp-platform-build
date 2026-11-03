@@ -4,7 +4,7 @@ resource "helm_release" "argocd" {
   create_namespace = true
   repository       = "https://argoproj.github.io/argo-helm"
   version          = "10.11.6"
-  chart            = "argocd"
+  chart            = "argo-cd"
 
   wait    = true
   timeout = 600
@@ -27,39 +27,6 @@ resource "helm_release" "argocd" {
       applicationSet = {
         enabled = false
       }
-
-      extraObjects = [
-        {
-          apiVersion = "argoproj.io/v1alpha1"
-          kind       = "Application"
-
-          metadata = {
-            name      = "root"
-            namespace = "argocd"
-          }
-
-          spec = {
-            project = "default"
-
-            source = {
-              repoURL        = "https://github.com/ChistelleOps/gcp-platform-gitops.git"
-              targetRevision = "main"
-              path           = "bootstrap"
-            }
-
-            destination = {
-              server    = "https://kubernetes.default.svc"
-              namespace = "argocd"
-            }
-
-            syncPolicy = {
-              automated = {
-                selfHeal = true
-              }
-            }
-          }
-        }
-      ]
     })
   ]
 }
