@@ -1,0 +1,35 @@
+
+name: GCP OIDC Authentication Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  test-auth:
+    name: Test GitHub to GCP Authentication
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: gcp-platform-lab-2026
+          workload_identity_provider: projects/126867811312/locations/global/workloadIdentityPools/github-actions/providers/github-oidc
+          service_account: terraform-ci@gcp-platform-lab-2026.iam.gserviceaccount.com
+
+      - name: Install Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Verify authentication
+        run: |
+          gcloud auth print-access-token > /dev/null
+          echo "GCP authentication successful!"
+
+          
