@@ -1,11 +1,18 @@
 resource "google_container_cluster" "primary" {
-  name     = "gcp-platform-lab-2026-gke-cluster"
-  location = var.location
-  project  = var.project_id
+  # checkov:skip=CKV_GCP_12:GKE Dataplane V2 provides built-in NetworkPolicy enforcement.
+  # checkov:skip=CKV_GCP_69:GKE metadata server is enabled in the separately managed node pool.
+  # checkov:skip=CKV_GCP_65:Single-user development lab; Google Groups RBAC deferred until multi-team access is implemented.
+  # checkov:skip=CKV_GCP_66:Binary Authorization deferred until the container image security pipeline and enforcement policy are implemented.
 
-  network         = google_compute_network.vpc.id
-  subnetwork      = google_compute_subnetwork.subnet.id
-  networking_mode = "VPC_NATIVE"
+  # Keep your existing configuration below.
+  name                        = "gcp-platform-lab-2026-gke-cluster"
+  location                    = var.location
+  project                     = var.project_id
+  datapath_provider           = "ADVANCED_DATAPATH"
+  enable_intranode_visibility = true
+  network                     = google_compute_network.vpc.id
+  subnetwork                  = google_compute_subnetwork.subnet.id
+  networking_mode             = "VPC_NATIVE"
   release_channel {
     channel = "REGULAR"
   }
@@ -38,5 +45,23 @@ resource "google_container_cluster" "primary" {
 
     gcp_public_cidrs_access_enabled = false
   }
+
+  # Disable client certificate authentication
+  master_auth {
+    client_certificate_config {
+      issue_client_certificate = false
+    }
+  }
+
+  # Identify and organize cluster resources
+  resource_labels = {
+    environment = "dev"
+    project     = "gcp-platform-lab"
+    managed_by  = "terraform"
+  }
 }
+
+
+
+
 
