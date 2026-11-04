@@ -6,7 +6,10 @@ resource "google_container_node_pool" "primary" {
   depends_on = [
     google_project_iam_member.gke_node_role
   ]
-
+  management {
+    auto_repair  = true
+    auto_upgrade = true
+  }
   node_config {
     machine_type = "e2-medium"
     disk_size_gb = 30
@@ -19,6 +22,10 @@ resource "google_container_node_pool" "primary" {
     }
     workload_metadata_config {
       mode = "GKE_METADATA"
+    }
+    shielded_instance_config {
+      enable_secure_boot          = true
+      enable_integrity_monitoring = true
     }
     service_account = google_service_account.gke_sa.email
   }
